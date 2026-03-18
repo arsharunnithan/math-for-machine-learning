@@ -108,3 +108,96 @@ print(np.cross(c, d))  # [-3  6 -3]
 | **K-Means Clustering** | Points assigned to clusters based on vector distances |
 | **Word2Vec / GloVe** | Words mapped to vectors capturing semantic meaning |
 | **BERT / Doc2Vec** | Sentences and documents encoded as vectors |
+---
+# Matrices and Matrix Arithmetic for ML
+
+## What is a Matrix?
+A 2D array of numbers arranged in rows and columns.
+
+- Element notation: `a[i][j]` — i = row, j = column
+- Order: `m x n` — m rows, n columns
+
+```python
+import numpy as np
+matrix = np.array([[1, 2, 3],
+                   [4, 5, 6],
+                   [7, 8, 9]])  # Order: 3x3
+```
+
+---
+
+## Matrix Operations
+
+### 1. Addition
+- Same order required
+- Corresponding elements are added
+
+```python
+A = np.array([[1, 2], [3, 4]])
+B = np.array([[5, 6], [7, 8]])
+C = A + B  # [[6, 8], [10, 12]]
+```
+
+### 2. Subtraction
+- Same order required
+- Corresponding elements are subtracted
+
+```python
+A = np.array([[1, 2], [3, 4]])
+B = np.array([[0, 1], [2, 1]])
+C = A - B  # [[1, 1], [1, 3]]
+```
+
+### 3. Division
+- Same order required
+- Element-wise division (`/` for float, `//` for integer)
+
+```python
+A = np.array([[4, 2], [6, 8]])
+B = np.array([[2, 2], [3, 4]])
+C = A // B  # [[2, 1], [2, 2]]
+```
+
+### 4. Matrix Multiplication (Dot Product)
+- Columns of A must equal rows of B
+- ⚠️ **Not commutative** — `AB ≠ BA`
+- Each element = dot product of row from A × column from B
+
+```python
+A = np.array([[1, 2], [3, 4]])
+B = np.array([[5, 6], [7, 8]])
+C = A.dot(B)  # [[19, 22], [43, 50]]
+```
+
+> `C[0][0] = 1×5 + 2×7 = 19`
+
+### 5. Vector Multiplication
+- Columns of matrix must equal rows of vector
+- Matrix × column vector → column vector
+
+```python
+A = np.array([[1, 2], [1, 1]])
+V = np.array([[1], [1]])
+C = A.dot(V)  # [[3], [2]]
+```
+
+### 6. Scalar Multiplication
+- Scalar multiplied with every element
+- Order remains the same
+
+```python
+A = np.array([[1, 2], [3, 4]])
+C = A * 2  # [[2, 4], [6, 8]]
+```
+
+---
+
+## Quick Reference
+
+| Operation | Requirement | Commutative? |
+|-----------|-------------|--------------|
+| Addition | Same order | ✅ Yes |
+| Subtraction | Same order | ❌ No |
+| Division | Same order | ❌ No |
+| Matrix Multiplication | Cols of A = Rows of B | ❌ No |
+| Scalar Multiplication | None | ✅ Yes |
