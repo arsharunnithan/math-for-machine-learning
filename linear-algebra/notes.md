@@ -201,3 +201,85 @@ C = A * 2  # [[2, 4], [6, 8]]
 | Division | Same order | ❌ No |
 | Matrix Multiplication | Cols of A = Rows of B | ❌ No |
 | Scalar Multiplication | None | ✅ Yes |
+---
+# Scalar Product of Vectors (Dot Product)
+
+## Definition
+The scalar product of two vectors A and B:
+
+```
+A · B = |A| |B| cos θ
+```
+
+- Result is a **scalar** (not a vector)
+- θ = angle between the two vectors
+
+---
+
+## Formula (Component Form)
+
+```
+A · B = Ax·Bx + Ay·By + Az·Bz
+```
+
+Where:
+- A = Ax·i + Ay·j + Az·k
+- B = Bx·i + By·j + Bz·k
+
+---
+
+## Matrix Representation
+
+Treat A as a **row matrix** (transpose) and B as a **column matrix**:
+
+```
+[Ax  Ay  Az] · [Bx]  =  Ax·Bx + Ay·By + Az·Bz
+               [By]
+               [Bz]
+```
+
+---
+
+## Sign Based on Angle
+
+| Angle (θ) | cos θ | Dot Product |
+|-----------|-------|-------------|
+| 0° < θ < 90° | Positive | Positive |
+| θ = 90° | 0 | **Zero** |
+| 90° < θ < 180° | Negative | Negative |
+
+---
+
+## Special Cases
+
+| Case | Angle | Result |
+|------|-------|--------|
+| Parallel vectors | 0° | `A · B = \|A\| \|B\|` |
+| Antiparallel vectors | 180° | `A · B = -\|A\| \|B\|` |
+| Orthogonal vectors | 90° | `A · B = 0` |
+
+---
+
+## Properties
+
+| Property | Formula |
+|----------|---------|
+| Commutative | `a · b = b · a` |
+| Distributive | `a · (b + c) = a·b + a·c` |
+| Associative (scalar) | `c(da) = (cd)a` |
+| Scalar consistency | `(ua) · (vb) = uv(a · b)` |
+| Orthogonality | `u · v = 0` → vectors are perpendicular |
+
+---
+
+## Applications
+
+- **Projection of a onto b** → `(a · b) / |b|`
+- **Angle between two vectors** → `cos θ = (a · b) / (|a| |b|)`
+- **Scalar Triple Product** → `a · (b × c) = b · (c × a) = c · (a × b)`
+
+---
+
+## ML Relevance
+- Dot product measures **similarity** between vectors
+- Used in **cosine similarity**, **neural network activations**, **attention mechanisms**
