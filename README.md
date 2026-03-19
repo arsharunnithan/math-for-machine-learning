@@ -10,9 +10,12 @@ A structured collection of mathematics notes — focused on concepts, formulas, 
 math-for-machine-learning/
 │
 └── linear-algebra/
-    ├── vectors_for_ml.md
-    ├── matrices_for_ml.md
-    └── scalar_product_of_vectors.md
+    └──notes.md
+        ├── vectors_for_ml.md
+        ├── matrices_for_ml.md
+        ├── scalar_product_of_vectors.md
+        ├──Euclidean distance and Manhattan distance
+        ├──Eigenvalues and Eigenvectors
 ```
 
 > More topics will be added progressively.
