@@ -283,3 +283,51 @@ Treat A as a **row matrix** (transpose) and B as a **column matrix**:
 ## ML Relevance
 - Dot product measures **similarity** between vectors
 - Used in **cosine similarity**, **neural network activations**, **attention mechanisms**
+---
+# Euclidean Distance & Manhattan Distance
+
+## Euclidean Distance
+
+The shortest straight-line distance between two points — like a bird flying directly from one spot to another. Based on the **Pythagorean theorem**.
+
+### Formulas
+
+**2D:**
+```
+d = √[(x2 - x1)² + (y2 - y1)²]
+```
+
+**3D:**
+```
+d = √[(x2 - x1)² + (y2 - y1)² + (z2 - z1)²]
+```
+
+**n-Dimensions:**
+```
+d = √[Σ(x2i - x1i)²]   for i = 1 to n
+```
+
+### Derivation (2D)
+- Draw a right-angled triangle with AB as hypotenuse
+- Apply Pythagorean theorem: `d² = (x2 - x1)² + (y2 - y1)²`
+- Take square root → Euclidean distance formula
+
+---
+
+## Euclidean vs Manhattan Distance
+
+| Aspect | Euclidean Distance | Manhattan Distance |
+|--------|-------------------|-------------------|
+| **Definition** | Shortest straight-line distance | Distance along axes at right angles |
+| **Formula (2D)** | `√[(x2-x1)² + (y2-y1)²]` | `\|x2-x1\| + \|y2-y1\|` |
+| **Path** | Direct straight line | City blocks / grid pattern |
+| **Metric Name** | L2 norm | L1 norm |
+| **Use Cases** | Physics, direct distance problems | Urban planning, optimization algorithms |
+| **Sensitivity to Scaling** | Less sensitive | More sensitive (adds absolute differences) |
+
+---
+
+## ML Relevance
+- **K-Means & KNN** — use Euclidean distance to find nearest points/clusters
+- **Recommendation systems** — Manhattan distance used in certain optimization setups
+- Choice of distance metric directly affects model performance
