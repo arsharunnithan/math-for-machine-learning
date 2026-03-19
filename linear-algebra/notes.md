@@ -287,47 +287,94 @@ Treat A as a **row matrix** (transpose) and B as a **column matrix**:
 # Euclidean Distance & Manhattan Distance
 
 ## Euclidean Distance
-
-The shortest straight-line distance between two points — like a bird flying directly from one spot to another. Based on the **Pythagorean theorem**.
+Shortest straight-line distance between two points — like a bird flying directly. Based on the **Pythagorean theorem**.
 
 ### Formulas
 
-**2D:**
-```
-d = √[(x2 - x1)² + (y2 - y1)²]
-```
-
-**3D:**
-```
-d = √[(x2 - x1)² + (y2 - y1)² + (z2 - z1)²]
-```
-
-**n-Dimensions:**
-```
-d = √[Σ(x2i - x1i)²]   for i = 1 to n
-```
+| Dimensions | Formula |
+|------------|---------|
+| 2D | `d = √[(x2-x1)² + (y2-y1)²]` |
+| 3D | `d = √[(x2-x1)² + (y2-y1)² + (z2-z1)²]` |
+| nD | `d = √[Σ(x2i - x1i)²]` |
 
 ### Derivation (2D)
-- Draw a right-angled triangle with AB as hypotenuse
-- Apply Pythagorean theorem: `d² = (x2 - x1)² + (y2 - y1)²`
-- Take square root → Euclidean distance formula
+Draw a right-angled triangle with AB as hypotenuse:
+```
+d² = (x2 - x1)² + (y2 - y1)²
+d  = √[(x2 - x1)² + (y2 - y1)²]
+```
 
 ---
 
-## Euclidean vs Manhattan Distance
+## Manhattan Distance
+Also known as **L1** or **taxicab distance**. Measures distance along grid-like paths — like a taxi navigating city streets.
 
-| Aspect | Euclidean Distance | Manhattan Distance |
-|--------|-------------------|-------------------|
+### Formulas
+
+| Dimensions | Formula |
+|------------|---------|
+| 2D | `d = \|x1-x2\| + \|y1-y2\|` |
+| 3D | `d = \|x1-x2\| + \|y1-y2\| + \|z1-z2\|` |
+| nD | `d = Σ\|xi - yi\|` |
+
+### Worked Examples
+
+| Points | Dimensions | Calculation | Result |
+|--------|------------|-------------|--------|
+| P=(1,2), Q=(4,0) | 2D | \|1-4\| + \|2-0\| | **5** |
+| P=(1,2,3), Q=(4,0,1) | 3D | 3+2+2 | **7** |
+| P=(1,2,3,4), Q=(4,0,1,2) | 4D | 3+2+2+2 | **9** |
+
+### Python
+
+```python
+# NumPy
+import numpy as np
+a = np.array([2, 3, 5])
+b = np.array([7, 1, 9])
+d = np.sum(np.abs(a - b))  # 11
+
+# SciPy
+from scipy.spatial.distance import cityblock
+d = cityblock((2,3,5), (7,1,9))  # 11
+```
+
+---
+
+## Euclidean vs Manhattan — Comparison
+
+| Aspect | Euclidean | Manhattan |
+|--------|-----------|-----------|
 | **Definition** | Shortest straight-line distance | Distance along axes at right angles |
 | **Formula (2D)** | `√[(x2-x1)² + (y2-y1)²]` | `\|x2-x1\| + \|y2-y1\|` |
 | **Path** | Direct straight line | City blocks / grid pattern |
 | **Metric Name** | L2 norm | L1 norm |
-| **Use Cases** | Physics, direct distance problems | Urban planning, optimization algorithms |
-| **Sensitivity to Scaling** | Less sensitive | More sensitive (adds absolute differences) |
+| **Sensitivity to Scaling** | Less sensitive | More sensitive |
+| **Use Cases** | Physics, open-space distances | Urban planning, optimization |
+
+> ⚠️ **Euclidean ≤ Manhattan always** — straight line is always shorter than grid path.
+> Example: P=(1,2), Q=(4,0) → Manhattan = **5**, Euclidean ≈ **3.61**
 
 ---
 
-## ML Relevance
-- **K-Means & KNN** — use Euclidean distance to find nearest points/clusters
-- **Recommendation systems** — Manhattan distance used in certain optimization setups
-- Choice of distance metric directly affects model performance
+## When to Use Which?
+
+| Use Manhattan when... | Use Euclidean when... |
+|----------------------|----------------------|
+| Movement is grid-restricted | Open space / physical distances |
+| Diagonal movement not allowed | Diagonal movement allowed |
+| High-dimensional ML data | Continuous data |
+| Discrete or ordinal data | Straight-line reflects reality |
+
+---
+
+## Applications
+
+| Algorithm/Domain | Distance Used | Why |
+|-----------------|--------------|-----|
+| KNN, K-Means | Euclidean | Finds nearest points in space |
+| A* Pathfinding | Manhattan | Grid-based routing heuristic |
+| Text / Document Clustering | Manhattan | Works well with sparse/high-dim data |
+| Fraud / Anomaly Detection | Manhattan | Less sensitive to extreme values |
+| GIS / Urban Planning | Manhattan | Models street grid movement |
+| Computer Vision | Both | Comparing pixel/feature vectors |
