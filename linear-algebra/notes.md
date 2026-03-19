@@ -378,3 +378,124 @@ d = cityblock((2,3,5), (7,1,9))  # 11
 | Fraud / Anomaly Detection | Manhattan | Less sensitive to extreme values |
 | GIS / Urban Planning | Manhattan | Models street grid movement |
 | Computer Vision | Both | Comparing pixel/feature vectors |
+---
+# Eigenvalues & Eigenvectors
+
+## Core Equation
+```
+Av = λv
+```
+- **A** — square matrix
+- **v** — eigenvector (direction unchanged under transformation)
+- **λ** — eigenvalue (how much the vector is stretched/compressed)
+
+> If λ is negative, the direction is **reversed**. If λ = 0, the vector is squished to zero.
+
+---
+
+## How to Find Eigenvalues & Eigenvectors
+
+**Step 1** — Solve for eigenvalues using:
+```
+det(A - λI) = 0
+```
+
+**Step 2** — For each eigenvalue λ, solve for eigenvector v using:
+```
+(A - λI)v = 0
+```
+
+---
+
+## Worked Example — 2×2 Matrix
+
+Matrix A = `[[1, 2], [5, 4]]`
+
+**Finding eigenvalues:**
+```
+det(A - λI) = 0
+(1-λ)(4-λ) - (2×5) = 0
+λ² - 5λ - 6 = 0
+(λ-6)(λ+1) = 0
+→ λ = 6 and λ = -1
+```
+
+**Eigenvector for λ = 6:**
+```
+(A - 6I)v = 0  →  5a = 2b  →  v = [2, 5]
+```
+
+**Eigenvector for λ = -1:**
+```
+(A + I)v = 0  →  a = -b  →  v = [1, -1]
+```
+
+---
+
+## Worked Example — 3×3 Matrix
+
+Matrix A = all 2s (3×3)
+
+**Eigenvalues:** λ = 6, λ = 0, λ = 0
+
+**Eigenvectors:**
+
+| λ | Eigenvector |
+|---|-------------|
+| 0 | `[-1, 1, 0]` and `[-1, 0, 1]` |
+| 6 | `[1, 1, 1]` |
+
+---
+
+## Types of Eigenvectors
+
+| Type | Equation | Shape |
+|------|----------|-------|
+| Right eigenvector | `AVR = λVR` | Column vector (n×1) |
+| Left eigenvector | `VLA = VLλ` | Row vector (1×n) |
+
+---
+
+## Eigenspace
+The **set of all eigenvectors** of a matrix — all linearly independent of each other.
+
+For the 3×3 example above, eigenspace = `{[-1,1,0], [-1,0,1], [1,1,1]}`
+
+---
+
+## Matrix Diagonalization
+A matrix can be written as:
+```
+A = X D X⁻¹
+```
+- **X** — matrix of eigenvectors (columns)
+- **D** — diagonal matrix with eigenvalues on the diagonal
+- **X⁻¹** — inverse of X
+
+For the 3×3 example:
+```
+D = [[6,0,0], [0,0,0], [0,0,0]]
+X = [[1,1,1], [1,-1,0], [1,0,-1]] (columns = eigenvectors)
+```
+
+---
+
+## Applications
+
+| Domain | How Eigenvalues/Vectors are Used |
+|--------|----------------------------------|
+| **PCA** | Eigenvectors = principal components; eigenvalues = variance explained |
+| **Google PageRank** | Eigenvector for λ=1 gives page importance scores |
+| **Eigenfaces (CV)** | Eigenvectors of face data used for recognition |
+| **NLP (LSA)** | Eigen-decomposition finds word-document relationships |
+| **Markov Processes** | Eigenvector for λ=1 gives long-term stable probabilities |
+| **Graph/Network Analysis** | Eigenvalues of graph Laplacian detect communities |
+| **Signal Processing** | Optimizes channels, noise filtering |
+| **Robotics/Control Systems** | Eigenvalues determine system stability |
+
+---
+
+## ML Relevance
+- **PCA is built entirely on eigenvectors** — must know this for interviews
+- Eigenvalues tell you how much variance each principal component captures
+- Dimensionality reduction, noise removal, image compression all rely on this
