@@ -499,3 +499,133 @@ X = [[1,1,1], [1,-1,0], [1,0,-1]] (columns = eigenvectors)
 - **PCA is built entirely on eigenvectors** — must know this for interviews
 - Eigenvalues tell you how much variance each principal component captures
 - Dimensionality reduction, noise removal, image compression all rely on this
+---
+# Singular Value Decomposition (SVD)
+
+## What is SVD?
+A factorization method that decomposes any matrix A into three matrices:
+
+```
+A = U Σ Vᵀ
+```
+
+| Matrix | Size | What it represents |
+|--------|------|--------------------|
+| **U** | m×m | Left singular vectors — patterns in rows (e.g. people/preferences) |
+| **Σ** | m×n | Diagonal matrix of singular values — importance of each factor |
+| **Vᵀ** | n×n | Right singular vectors — patterns in columns (e.g. items/features) |
+
+> Singular values in Σ are always in **descending order** (most important first)
+
+---
+
+## Intuition (Movie Ratings Example)
+
+| Name | Movie 1 | Movie 2 |
+|------|---------|---------|
+| Amit | 5 | 3 |
+| Sanket | 4 | 2 |
+| Harsh | 2 | 5 |
+
+SVD splits this into: **U** (people's preferences) + **Σ** (importance of each factor) + **Vᵀ** (movie similarities)
+
+---
+
+## How to Compute SVD — Step by Step
+
+Given A = `[[3,2,2], [2,3,-2]]`:
+
+**Step 1** — Compute AAᵀ
+
+**Step 2** — Find eigenvalues of AAᵀ using `det(AAᵀ - λI) = 0`
+- Singular values σ = √λ (square root of eigenvalues)
+- Example: λ = 25, 9 → σ₁ = 5, σ₂ = 3
+
+**Step 3** — Find right singular vectors V (eigenvectors of AᵀA)
+
+**Step 4** — Compute left singular vectors U using:
+```
+uᵢ = (1/σᵢ) Avᵢ
+```
+
+**Step 5** — Assemble:
+```
+Σ = [[5, 0, 0],   U = [[1/√2,  1/√2],    Vᵀ = (eigenvectors of AᵀA)
+     [0, 3, 0]]        [1/√2, -1/√2]]
+```
+
+---
+
+## Python Implementation
+
+```python
+import numpy as np
+from scipy.linalg import svd
+
+X = np.array([[3, 3, 2], [2, 3, -2]])
+
+U, singular, V_T = svd(X)
+
+print("U:", U)
+print("Singular values:", singular)
+print("Vᵀ:", V_T)
+```
+
+**Pseudo-inverse using SVD:**
+```python
+singular_inv = 1.0 / singular
+s_inv = np.zeros(X.shape)
+s_inv[0][0] = singular_inv[0]
+s_inv[1][1] = singular_inv[1]
+M_plus = np.dot(np.dot(V_T.T, s_inv.T), U.T)
+```
+
+**Image compression using SVD:**
+```python
+U, S, V_T = svd(gray_image, full_matrices=False)
+S = np.diag(S)
+
+# Reconstruct with only top r singular values
+r = 50
+approx = U[:, :r] @ S[0:r, :r] @ V_T[:r, :]
+```
+
+---
+
+## Key Concepts
+
+| Term | Meaning |
+|------|---------|
+| **Rank** | Number of non-zero singular values in Σ |
+| **Range** | Span of left singular vectors (U) for non-zero σ |
+| **Null Space** | Span of right singular vectors (V) for zero σ |
+| **Pseudo-inverse** | `M⁺ = V Σ⁻¹ Uᵀ` — works even for non-invertible matrices |
+
+---
+
+## Applications
+
+| Domain | Use |
+|--------|-----|
+| **Image Compression** | Keep top-k singular values, discard the rest |
+| **Recommender Systems** | Decompose user-item rating matrix |
+| **NLP (LSA)** | Find semantic relationships between words/documents |
+| **Noise Filtering** | Small singular values = noise, discard them |
+| **Solving Linear Equations** | `x = M⁺b` via pseudo-inverse |
+| **Curve Fitting** | Minimize least squares error |
+| **Signal Processing** | Analyze and filter signals |
+
+---
+
+## SVD vs Eigendecomposition
+
+| | Eigendecomposition | SVD |
+|---|---|---|
+| Works on | Square matrices only | **Any** m×n matrix |
+| Output | Eigenvalues + eigenvectors | Singular values + U, V |
+| Used in | PCA (on square covariance matrix) | PCA, compression, NLP |
+
+## ML Relevance
+- PCA can be implemented directly via SVD (more numerically stable than eigendecomposition)
+- Truncated SVD is used for **dimensionality reduction** on sparse data (text)
+- Foundation of **matrix factorization** in recommendation systems
