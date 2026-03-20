@@ -629,3 +629,76 @@ approx = U[:, :r] @ S[0:r, :r] @ V_T[:r, :]
 - PCA can be implemented directly via SVD (more numerically stable than eigendecomposition)
 - Truncated SVD is used for **dimensionality reduction** on sparse data (text)
 - Foundation of **matrix factorization** in recommendation systems
+---
+# Cosine Similarity
+
+## What is it?
+Measures how **similar two vectors are based on direction**, regardless of magnitude.
+
+```
+Cosine Similarity = (A · B) / (||A|| × ||B||)
+```
+
+- **A · B** — dot product of A and B
+- **||A||, ||B||** — Euclidean (L2) norm of each vector
+- Result is always between **-1 and 1**
+
+| Value | Meaning |
+|-------|---------|
+| 1 | Identical direction (most similar) |
+| 0 | Perpendicular (no similarity) |
+| -1 | Opposite direction (most dissimilar) |
+
+---
+
+## Cosine Similarity vs Euclidean Distance
+
+| | Cosine Similarity | Euclidean Distance |
+|---|---|---|
+| Measures | **Direction** (angle between vectors) | **Magnitude** (straight-line distance) |
+| Scale sensitive? | ❌ No | ✅ Yes |
+| Best for | High-dimensional data, text, embeddings | Physical/spatial distances |
+
+---
+
+## Python Examples
+
+### 1. Two 1D Vectors
+```python
+import numpy as np
+from numpy.linalg import norm
+
+A = np.array([2, 1, 2, 3, 2, 9])
+B = np.array([3, 4, 2, 4, 5, 5])
+
+cosine = np.dot(A, B) / (norm(A) * norm(B))
+print("Cosine Similarity:", cosine)  # 0.8189
+```
+
+### 2. One Vector vs a Batch (row-wise)
+```python
+A = np.array([[2, 1, 2], [3, 2, 9], [-1, 2, -3]])
+B = np.array([3, 4, 2])
+
+cosine = np.dot(A, B) / (norm(A, axis=1) * norm(B))
+print("Cosine Similarity:", cosine)  # [ 0.867  0.670 -0.050]
+```
+> Negative value = vectors pointing in opposite directions
+
+### 3. Two Matrices (row-wise comparison)
+```python
+A = np.array([[1, 2, 2], [3, 2, 2], [-2, 1, -3]])
+B = np.array([[4, 2, 4], [2, -2, 5], [3, 4, -4]])
+
+cosine = np.sum(A * B, axis=1) / (norm(A, axis=1) * norm(B, axis=1))
+print("Cosine Similarity:", cosine)  # [0.889  0.507  0.417]
+```
+> `np.sum(A * B, axis=1)` = row-wise dot products
+
+---
+
+## ML Relevance
+- **NLP** — comparing word embeddings (Word2Vec, GloVe), TF-IDF vectors
+- **Recommendation Systems** — finding similar users or items
+- **Document Clustering** — measuring how similar two documents are
+- **Search Engines** — ranking results by similarity to query vector
