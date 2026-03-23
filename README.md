@@ -11,13 +11,15 @@ math-for-machine-learning/
 │
 └── linear-algebra/
     └──notes.md
-        ├── vectors_for_ml.md
-        ├── matrices_for_ml.md
-        ├── scalar_product_of_vectors.md
+        ├── vectors_for_ml
+        ├── matrices_for_ml
+        ├── scalar_product_of_vectors
         ├──Euclidean distance and Manhattan distance
         ├──Eigenvalues and Eigenvectors
         ├──SVD
         ├──Cosine similarity
+        ├──Jaccard Similarity
+        ├──Orthogonal Projections
 ```
 
 > More topics will be added progressively.
