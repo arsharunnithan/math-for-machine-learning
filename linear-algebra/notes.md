@@ -702,3 +702,100 @@ print("Cosine Similarity:", cosine)  # [0.889  0.507  0.417]
 - **Recommendation Systems** — finding similar users or items
 - **Document Clustering** — measuring how similar two documents are
 - **Search Engines** — ranking results by similarity to query vector
+---
+# Jaccard Similarity
+
+## What is it?
+Measures overlap between two **sets**. Ratio of intersection to union.
+
+```
+J(A, B) = |A ∩ B| / |A ∪ B|
+```
+
+| Value | Meaning |
+|-------|---------|
+| 1 | Sets are identical |
+| 0 | No common elements |
+
+---
+
+## For Sets
+
+**Example:** A = {1,2,3,4,5}, B = {3,4,5,6,7}
+
+```
+A ∩ B = {3,4,5}       → 3 elements
+A ∪ B = {1,2,3,4,5,6,7} → 7 elements
+J(A,B) = 3/7 ≈ 0.428
+```
+
+```python
+A = {1, 2, 3, 4, 5}
+B = {3, 4, 5, 6, 7}
+
+jaccard = len(A & B) / len(A | B)  # 0.43
+```
+
+---
+
+## For Binary Vectors
+
+```
+J(A, B) = M11 / (M01 + M10 + M11)
+```
+
+| Term | Meaning |
+|------|---------|
+| M11 | Both vectors have 1 |
+| M10 | A=1, B=0 |
+| M01 | A=0, B=1 |
+> Note: positions where **both are 0 are ignored**
+
+**Example:**
+```
+A = [1, 1, 0, 1, 0, 1, 0]
+B = [1, 0, 0, 1, 1, 1, 0]
+
+M11 = 3 (positions 1, 4, 6)
+M10 = 1 (position 2)
+M01 = 1 (position 5)
+
+J = 3 / (3+1+1) = 3/5 = 0.6
+```
+
+```python
+from sklearn.metrics import jaccard_score
+import numpy as np
+
+A = np.array([1, 1, 0, 1, 0, 1, 0])
+B = np.array([1, 0, 0, 1, 1, 1, 0])
+
+print(jaccard_score(A, B))  # 0.6
+```
+
+---
+
+## Cosine vs Jaccard
+
+| | Cosine Similarity | Jaccard Similarity |
+|---|---|---|
+| Input | Continuous vectors | Sets / binary vectors |
+| Measures | Angle between vectors | Set overlap |
+| Ignores | Magnitude | Double-zero positions |
+| Best for | Word embeddings, TF-IDF | Boolean data, document comparison |
+
+---
+
+## Applications
+
+| Domain | Use |
+|--------|-----|
+| **Plagiarism Detection** | Compare word/n-gram sets between documents |
+| **Recommendation Systems** | Find users with similar liked items |
+| **Object Detection (IoU)** | Jaccard = Intersection over Union — measures bounding box overlap |
+| **Genomics** | Compare DNA/protein sequences |
+
+## ML Relevance
+- **IoU (Intersection over Union)** in object detection is Jaccard similarity
+- Used in **document deduplication** and **near-duplicate detection**
+- Good choice when data is **sparse and binary** (vs cosine for dense vectors)
