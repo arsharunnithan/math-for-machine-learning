@@ -201,6 +201,86 @@ print("Gradient at (1,2):", grad_value)  # [2, 12]
 | **Robotics** | Gradient-based path planning |
 
 ---
+# Higher Order Derivatives
+
+## What are they?
+Derivatives obtained by repeatedly differentiating a function.
+
+| Derivative | Notation | Measures |
+|------------|----------|---------|
+| 1st | `f'(x)` or `dy/dx` | Rate of change / slope |
+| 2nd | `f''(x)` or `d²y/dx²` | Curvature / concavity |
+| 3rd | `f'''(x)` or `d³y/dx³` | Rate of change of curvature |
+| nth | `fⁿ(x)` or `dⁿy/dxⁿ` | nth rate of change |
+
+---
+
+## Second Order Derivative
+
+Differentiate f'(x) again:
+```
+y = f(x)
+dy/dx = f'(x)
+d²y/dx² = d/dx[f'(x)] = f''(x)
+```
+
+**Example:** y = x / (x² + 1), find y'' at x = 1
+
+```
+Step 1 — First derivative (quotient rule):
+y' = (1 - x²) / (x² + 1)²
+
+Step 2 — Second derivative at x = 1:
+y''(1) = 0
+```
+
+---
+
+## Third Order Derivative
+
+Differentiate f''(x) again:
+```
+d³y/dx³ = d/dx[f''(x)] = f'''(x)
+```
+
+**Example:** y = 3x³ + 12x + 4, find y''' at x = 1
+
+```
+y'(x)   = 9x² + 12
+y''(x)  = 18x
+y'''(x) = 18
+
+y'''(1) = 18
+```
+
+---
+
+## Higher-Order Derivatives in Parametric Form
+
+When x = x(t) and y = y(t):
+```
+dy/dx = (dy/dt) / (dx/dt)
+
+d²y/dx² = d/dt[y'(t)/x'(t)] × (1/x'(t))
+```
+
+---
+
+## Applications
+
+| Use | How |
+|-----|-----|
+| **Maxima & Minima** | f'(x) = 0 and f''(x) < 0 → maximum; f''(x) > 0 → minimum |
+| **Concavity** | f''(x) > 0 → concave up; f''(x) < 0 → concave down |
+| **Acceleration** | 2nd derivative of position = acceleration |
+| **Graph Shape** | Inflection points where f''(x) = 0 |
+
+---
+
+## ML Relevance
+- **Loss landscape analysis** — 2nd derivative tells if a critical point is a minimum or saddle point
+- **Newton's Method** — uses 2nd derivative for faster optimization than gradient descent
+- **Hessian Matrix** — matrix of 2nd order partial derivatives, used in advanced optimizers
 
 ## ML Relevance
 - The gradient of the **loss function** tells us which direction increases the error
