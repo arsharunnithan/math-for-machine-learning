@@ -286,3 +286,106 @@ d²y/dx² = d/dt[y'(t)/x'(t)] × (1/x'(t))
 - The gradient of the **loss function** tells us which direction increases the error
 - We move **against** the gradient to reduce loss — this is gradient descent
 - Every weight update in neural networks uses the gradient
+---
+# Multivariable Calculus
+
+## What is it?
+Extends single-variable calculus to functions with **multiple input variables** — essential for ML since models have thousands of parameters.
+
+```
+f(x₁, x₂, ..., xₙ) = y
+```
+
+---
+
+## Key Concepts
+
+### Partial Derivatives
+Rate of change of f with respect to **one variable**, keeping all others constant.
+
+```
+∂f/∂x  →  how f changes as x changes (y fixed)
+∂f/∂y  →  how f changes as y changes (x fixed)
+```
+
+### Gradient Vector
+Vector of all partial derivatives — points in direction of **steepest ascent**:
+```
+∇f = (∂f/∂x₁, ∂f/∂x₂, ..., ∂f/∂xₙ)
+```
+> In ML we follow the **negative gradient** to descend toward the minimum
+
+---
+
+## Gradient Vector Field — Key Observations
+For f(x,y) = x² + y²:
+- Gradient vectors point **radially outward** from origin
+- Vector magnitude **increases** away from origin (steeper further out)
+- Level curves (contours) are always **perpendicular** to gradient vectors
+
+---
+
+## Optimization with Constraints
+
+General form:
+```
+minimize  f₀(x)
+subject to  fᵢ(x) ≤ 0    (inequality constraints)
+            hⱼ(x) = 0    (equality constraints)
+```
+
+**Lagrange Multipliers** — technique to incorporate constraints into optimization by finding stationary points of the Lagrangian.
+
+```python
+from scipy.optimize import minimize
+import numpy as np
+
+def objective(x):
+    return (x[0] - 2)**2 + (x[1] - 3)**2
+
+constraints = [
+    {'type': 'ineq', 'fun': lambda x: x[0] - 1},   # x1 >= 1
+    {'type': 'ineq', 'fun': lambda x: x[1] - 2},   # x2 >= 2
+    {'type': 'eq',   'fun': lambda x: x[0] + x[1] - 4}  # x1 + x2 = 4
+]
+
+result = minimize(objective, [0, 0], method='SLSQP',
+                  bounds=((1, None), (2, None)),
+                  constraints=constraints)
+
+print("Optimal x:", result.x)       # [1.5, 2.5]
+print("Min value:", result.fun)     # 0.5
+```
+
+---
+
+## Applications in ML
+
+| Application | How Multivariable Calculus is Used |
+|-------------|-----------------------------------|
+| **Gradient Descent** | Partial derivatives of loss w.r.t. each parameter |
+| **Backpropagation** | Chain rule applied across layers to compute gradients |
+| **Neural Network Training** | Update weights using ∇Loss at each step |
+| **Hessian / 2nd Order Optimization** | Matrix of 2nd partial derivatives for Newton's method |
+| **Constrained Optimization** | Lagrange multipliers for regularization (L1, L2) |
+| **MLE / Bayesian Inference** | Gradient of likelihood function w.r.t. model parameters |
+
+---
+
+## Optimization Variants
+
+| Method | Gradient Used | Speed | Stability |
+|--------|--------------|-------|-----------|
+| **Batch Gradient Descent** | Full dataset | Slow | Stable |
+| **Stochastic GD (SGD)** | Single sample | Fast | Noisy |
+| **Mini-Batch GD** | Subset of data | Balanced | Balanced |
+| **Newton's Method** | Gradient + Hessian | Faster convergence | Expensive |
+| **Quasi-Newton (BFGS)** | Approximate Hessian | Efficient | Good |
+
+---
+
+## ML Relevance
+- Every weight update in a neural network is a multivariable calculus operation
+- The loss function is a **scalar function of thousands of variables** (weights)
+- Gradient descent only works because of partial derivatives
+- Backpropagation = chain rule applied to a multivariable composite function
