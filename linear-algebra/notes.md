@@ -799,3 +799,82 @@ print(jaccard_score(A, B))  # 0.6
 - **IoU (Intersection over Union)** in object detection is Jaccard similarity
 - Used in **document deduplication** and **near-duplicate detection**
 - Good choice when data is **sparse and binary** (vs cosine for dense vectors)
+---
+# Orthogonal Projections
+
+## Key Definitions
+
+**Orthogonal Set**
+A set of vectors {u₁, u₂, ... uₚ} where every pair is perpendicular:
+```
+uᵢ · uⱼ = 0  for all i ≠ j
+```
+
+**Orthogonal Basis**
+A basis for a subspace W that is also an orthogonal set.
+
+---
+
+## Finding Coefficients in an Orthogonal Basis
+
+If {u₁, u₂, ... uₚ} is an orthogonal basis and `y = c₁u₁ + c₂u₂ + ... cₚuₚ`, then each coefficient is:
+
+```
+cⱼ = (y · uⱼ) / (uⱼ · uⱼ)
+```
+
+> Because all other dot products cancel to 0 (orthogonality property)
+
+---
+
+## Orthogonal Projection
+
+The **orthogonal projection** of y onto subspace W:
+
+```
+ŷ = [(y·u₁)/(u₁·u₁)]u₁ + [(y·u₂)/(u₂·u₂)]u₂ + ... + [(y·uₚ)/(uₚ·uₚ)]uₚ
+```
+
+Every vector y can be split into two parts:
+```
+y = ŷ + z
+```
+
+| Part | Description |
+|------|-------------|
+| **ŷ** | Projection of y **onto** W (lives in W) |
+| **z = y - ŷ** | Component **orthogonal** to W (z · uᵢ = 0 for all i) |
+
+---
+
+## Orthogonal Decomposition Theorem
+
+For any y in Rⁿ and subspace W, there is a **unique** decomposition:
+```
+y = ŷ + z
+```
+where ŷ ∈ W and z ∈ W⊥ (orthogonal complement of W)
+
+---
+
+## Best Approximation Theorem
+
+Among **all vectors in W**, ŷ is the **closest** to y:
+
+```
+||y - v|| > ||y - ŷ||   for any v ≠ ŷ in W
+```
+
+Proof sketch:
+```
+||y - v||² = ||y - ŷ||² + ||ŷ - v||²
+```
+Since `||ŷ - v||² ≥ 0`, we always have `||y - v|| ≥ ||y - ŷ||`
+
+---
+
+## ML Relevance
+- **PCA** — projects high-dimensional data onto lower-dimensional orthogonal subspace
+- **Linear Regression** — the predicted values ŷ are the orthogonal projection of y onto the column space of X
+- **Gram-Schmidt process** — builds orthogonal bases, used in QR decomposition
+- Orthogonality = **no redundancy** between components → cleaner features
