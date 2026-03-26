@@ -389,3 +389,120 @@ print("Min value:", result.fun)     # 0.5
 - The loss function is a **scalar function of thousands of variables** (weights)
 - Gradient descent only works because of partial derivatives
 - Backpropagation = chain rule applied to a multivariable composite function
+---
+# Chain Rule
+
+## What is it?
+Computes the derivative of a **composite function** — a function inside another function.
+
+```
+y = f(g(x))
+dy/dx = (df/dg) · (dg/dx)
+```
+
+> In plain terms: multiply the derivatives of each layer together
+
+---
+
+## Why it Matters in ML
+Neural networks are composed of many layers — each a function of the previous.
+The chain rule lets us compute **how much each weight contributed to the final loss**, layer by layer → this is **backpropagation**.
+
+---
+
+## Neural Network Example (Step by Step)
+
+**Setup:**
+- Input: x = [x1, x2]
+- Hidden layer: a1 = σ(W1·x + b1)
+- Output: z = σ(W2·a1 + b2)
+- Loss: L = ½(z - y)²
+
+### Step 1 — Forward Pass
+```
+a1 = σ(W1·x + b1)     ← hidden layer activation
+z  = σ(W2·a1 + b2)    ← final output
+```
+
+### Step 2 — Loss
+```
+L = ½(z - y)²
+```
+
+### Step 3 — Chain Rule (Backpropagation)
+
+**Output layer gradient:**
+```
+∂L/∂z  = z - y
+∂z/∂W2 = z(1-z) · a1ᵀ       ← sigmoid derivative
+∂L/∂W2 = ∂L/∂z · ∂z/∂W2    ← chain rule
+∂L/∂b2 = ∂L/∂z · z(1-z)
+```
+
+### Step 4 — Parameter Update
+```
+W1 = W1 - α · ∂L/∂W1
+b1 = b1 - α · ∂L/∂b1
+W2 = W2 - α · ∂L/∂W2
+b2 = b2 - α · ∂L/∂b2
+```
+
+---
+
+## PyTorch Implementation
+
+```python
+import torch
+import torch.nn as nn
+
+class SimpleNet(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.hidden = nn.Linear(2, 2)
+        self.output = nn.Linear(2, 1)
+        self.sigmoid = nn.Sigmoid()
+
+    def forward(self, x):
+        a1 = self.sigmoid(self.hidden(x))
+        return self.sigmoid(self.output(a1))
+
+net = SimpleNet()
+x = torch.tensor([[0.5, 1.5]], dtype=torch.float32)
+target = torch.tensor([[1.0]], dtype=torch.float32)
+
+output = net(x)                          # forward pass
+loss = nn.MSELoss()(output, target)      # compute loss
+loss.backward()                          # chain rule applied automatically
+
+print(net.hidden.weight.grad)            # gradients via backprop
+print(net.output.weight.grad)
+```
+
+---
+
+## Applications
+
+| Application | How Chain Rule is Used |
+|-------------|----------------------|
+| **Backpropagation** | Propagates loss gradient backward through each layer |
+| **Gradient Descent** | Computes ∂L/∂w for every weight |
+| **RNNs** | Chain rule applied through time steps |
+| **CNNs** | Gradients through convolutional layers |
+| **AutoDiff (PyTorch/TensorFlow)** | Chain rule automated via computation graph |
+
+---
+
+## Advantages & Limitations
+
+| ✅ Advantages | ⚠️ Limitations |
+|--------------|--------------|
+| Enables backpropagation at scale | Vanishing / exploding gradients in deep networks |
+| Integrated into all major frameworks | Requires differentiable functions |
+| Works across all architectures | Computationally expensive for very deep networks |
+
+---
+
+## ML Relevance
+- **Backpropagation = chain rule applied repeatedly** from output to input
+- Every framework (PyTorch, TensorFlow, JAX) automates this via **autograd**
+- Understanding chain rule = understanding how neural networks actually learn
