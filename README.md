@@ -21,16 +21,39 @@ math-for-machine-learning/
 │       ├── Jaccard Similarity
 │       └── Orthogonal Projections
 │
-└── calculus/
+├── calculus/
+│   └── notes.md
+│       ├── Fundamental Calculus Concepts
+│       ├── Gradient
+│       ├── Higher-Order Derivatives
+│       ├── Multivariable Calculus
+│       ├── Chain Rule
+│       ├── Jacobian & Hessian Matrices
+│       ├── Gradient Descent
+│       └── Stochastic Gradient Descent
+│
+├── statistics/
+│   └── notes.md
+│       ├── Descriptive Statistics
+│       ├── Inferential Statistics
+│       ├── Correlation and Covariance
+│       ├── Hypothesis Testing
+│       ├── Confidence Intervals
+│       ├── P-Value
+│       ├── Skewness and Kurtosis
+│       ├── Parametric Tests (T-test, F-test, Z-test, Chi-square)
+│       ├── Bias & Variance Tradeoff
+│       ├── Maximum Likelihood Estimation (MLE)
+│       └── Mean Squared Error
+│
+└── probability/
     └── notes.md
-        ├── Fundamental Calculus Concepts
-        ├── Gradient
-        ├── Higher-Order Derivatives
-        ├── Multivariable Calculus
-        ├── Chain Rule
-        ├── Jacobian & Hessian Matrices
-        ├── Gradient Descent
-        └── Stochastic Gradient Descent
+        ├── Basic Probability (Sample Space, Events, Rules)
+        ├── Joint, Conditional & Marginal Probability
+        ├── Bayes' Theorem
+        ├── Probability Distributions
+        ├── Sampling Distributions
+        └── t-Distribution
 ```
 
 > More topics will be added progressively.
