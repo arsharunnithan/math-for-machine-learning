@@ -506,3 +506,379 @@ print(net.output.weight.grad)
 - **Backpropagation = chain rule applied repeatedly** from output to input
 - Every framework (PyTorch, TensorFlow, JAX) automates this via **autograd**
 - Understanding chain rule = understanding how neural networks actually learn
+---
+# Jacobian & Hessian Matrices
+
+---
+
+## Jacobian Matrix
+
+Matrix of **all first-order partial derivatives** of a vector-valued function.
+
+For f: Rⁿ → Rᵐ (n inputs, m outputs):
+
+```
+J(x) = | ∂f₁/∂x₁  ∂f₁/∂x₂  ...  ∂f₁/∂xₙ |
+       | ∂f₂/∂x₁  ∂f₂/∂x₂  ...  ∂f₂/∂xₙ |
+       |    ⋮          ⋮      ⋱      ⋮    |
+       | ∂fₘ/∂x₁  ∂fₘ/∂x₂  ...  ∂fₘ/∂xₙ |
+```
+
+- Size: **m × n**
+- Generalizes the gradient to vector-valued functions
+
+### Worked Example
+
+f(x,y) = (x⁴ + 3y²x,  5y² - 2xy + 1) at point (1, 2)
+
+**Partial derivatives:**
+```
+∂f₁/∂x = 4x³ + 3y²    ∂f₁/∂y = 6yx
+∂f₂/∂x = -2y           ∂f₂/∂y = 10y - 2x
+```
+
+**Jacobian:**
+```
+Jf(x,y) = | 4x³+3y²   6yx    |
+           | -2y        10y-2x |
+```
+
+**At (1, 2):**
+```
+Jf(1,2) = | 16   12 |
+           | -4   18 |
+```
+
+---
+
+## Hessian Matrix
+
+Matrix of **all second-order partial derivatives** of a scalar function — captures curvature.
+
+For f(x₁, x₂, ..., xₙ):
+
+```
+H(f) = | ∂²f/∂x₁²      ∂²f/∂x₁∂x₂  ...  ∂²f/∂x₁∂xₙ |
+       | ∂²f/∂x₂∂x₁    ∂²f/∂x₂²    ...  ∂²f/∂x₂∂xₙ |
+       |      ⋮               ⋮       ⋱       ⋮       |
+       | ∂²f/∂xₙ∂x₁    ∂²f/∂xₙ∂x₂  ...  ∂²f/∂xₙ²   |
+```
+
+- Always a **square n × n** matrix
+- Symmetric: ∂²f/∂xᵢ∂xⱼ = ∂²f/∂xⱼ∂xᵢ
+
+### Worked Example
+
+f(x,y) = y⁴ + x³ + 3x² + 4y² - 4xy - 5y + 8 at point (1, 0)
+
+**First derivatives:**
+```
+∂f/∂x = 3x² + 6x - 4y
+∂f/∂y = 4y³ + 8y - 4x - 5
+```
+
+**Second derivatives:**
+```
+∂²f/∂x²   = 6x + 6
+∂²f/∂y²   = 12y² + 8
+∂²f/∂x∂y  = -4
+```
+
+**Hessian:**
+```
+Hf(x,y) = | 6x+6    -4    |
+           | -4    12y²+8  |
+```
+
+**At (1, 0):**
+```
+Hf(1,0) = | 12  -4 |
+           | -4   8 |
+```
+
+---
+
+## Jacobian vs Hessian
+
+| | Jacobian | Hessian |
+|---|---|---|
+| **Derivative order** | 1st order | 2nd order |
+| **Input function** | Vector-valued f: Rⁿ → Rᵐ | Scalar f: Rⁿ → R |
+| **Output shape** | m × n matrix | n × n square matrix |
+| **Captures** | How outputs change w.r.t. inputs | Curvature of the function |
+| **Always symmetric?** | Not necessarily | ✅ Yes |
+
+---
+
+## Applications
+
+### Jacobian
+| Use | Description |
+|-----|-------------|
+| **Backpropagation** | Gradients of vector-valued layer outputs |
+| **Feature sensitivity** | How sensitive model output is to each input |
+| **Change of variables** | Used in integral transformations |
+
+### Hessian
+| Use | Description |
+|-----|-------------|
+| **Newton's Method** | Uses H to find minima faster than gradient descent |
+| **Curvature Analysis** | Positive definite H → local minimum; negative definite → maximum |
+| **L-BFGS optimizer** | Approximates Hessian for efficient second-order optimization |
+| **Saddle point detection** | Mixed eigenvalues of H → saddle point |
+
+---
+
+## ML Relevance
+- **Jacobian** is used in backprop when layer outputs are vectors
+- **Hessian** used in second-order optimizers (Newton, L-BFGS) — faster convergence but expensive to compute for large models
+- Hessian eigenvalues reveal the loss landscape: flat regions, sharp minima, saddle points
+---
+# Gradient Descent
+
+## What is it?
+An iterative optimization algorithm that minimizes a cost function by moving parameters in the **direction opposite to the gradient**.
+
+> Analogy: Standing on a hill, feeling the slope, and taking steps downhill until you reach the valley.
+
+---
+
+## Core Update Rule
+
+```
+w = w - γ · ∂J/∂w
+```
+
+- **w** — model parameter (weight)
+- **γ (alpha)** — learning rate
+- **∂J/∂w** — gradient of the loss w.r.t. w
+
+| Gradient sign | Effect |
+|---------------|--------|
+| Positive | Subtract → w decreases |
+| Negative | Subtract negative → w increases |
+
+---
+
+## Mathematics (Linear Regression Example)
+
+**Loss function (MSE):**
+```
+J(w, b) = (1/n) Σ(yₚ - y)²    where yₚ = x·w + b
+```
+
+**Gradient w.r.t. w:**
+```
+∂J/∂w = (2/n) Σ(yₚ - y)·x
+```
+
+**Parameter update:**
+```
+w = w - γ · ∂J/∂w
+b = b - γ · ∂J/∂b
+```
+
+---
+
+## Learning Rate
+
+| Learning Rate | Effect |
+|--------------|--------|
+| Too small | Tiny steps → very slow convergence |
+| Too large | Overshoots minimum → oscillates, diverges |
+| Just right | Smooth, fast convergence |
+
+**Solutions for bad learning rates:**
+- **Gradient clipping** — cap gradients to a predefined range
+- **Batch normalization** — normalize layer inputs to stabilize training
+- **Weight initialization** — start weights in appropriate range
+
+---
+
+## How it Works (Steps)
+
+1. Initialize parameters randomly
+2. Compute gradient of cost function w.r.t. each parameter
+3. Update parameters in the opposite direction of the gradient
+4. Repeat until convergence
+
+---
+
+## Python Implementation
+
+```python
+import numpy as np
+from sklearn.datasets import load_diabetes
+from sklearn.preprocessing import StandardScaler
+
+diabetes = load_diabetes()
+X = diabetes.data[:, [2]]
+y = diabetes.target
+
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+
+m, c = 0.0, 0.0
+learning_rate = 0.05
+iterations = 1000
+
+for i in range(iterations):
+    y_pred = m * X_scaled.flatten() + c
+    error = y_pred - y
+
+    dm = (2 / len(X_scaled)) * np.dot(error, X_scaled.flatten())
+    dc = (2 / len(X_scaled)) * np.sum(error)
+
+    m -= learning_rate * dm
+    c -= learning_rate * dc
+```
+
+---
+
+## Variants of Gradient Descent
+
+| Variant | Data Used | Speed | Stability |
+|---------|-----------|-------|-----------|
+| **Batch GD** | Entire dataset | Slow | Stable |
+| **Stochastic GD (SGD)** | 1 sample | Fast | Noisy |
+| **Mini-Batch GD** | Small batch | Balanced | Balanced |
+| **Momentum** | Batch + previous gradient | Faster | Smoother |
+| **Adagrad** | Adapts lr per parameter | — | Good for sparse data |
+| **RMSprop** | Moving avg of squared gradients | — | Better than Adagrad |
+| **Adam** | Momentum + RMSprop combined | Fast | Most widely used |
+
+---
+
+## Advantages & Limitations
+
+| ✅ Advantages | ⚠️ Limitations |
+|--------------|--------------|
+| Works with any differentiable loss | Sensitive to learning rate choice |
+| Scalable to large datasets | Can get stuck in local minima |
+| Flexible across model types | Sensitive to weight initialization |
+| Converges to global min (convex) | Slow on large datasets (Batch GD) |
+
+---
+
+## ML Relevance
+- **Every neural network** is trained using some variant of gradient descent
+- **Adam** is the default optimizer in most modern deep learning workflows
+- Vanishing/exploding gradients are the main failure modes — understand them
+- Learning rate is the most important hyperparameter to tune
+---
+# Stochastic Gradient Descent (SGD)
+
+## What is it?
+A variant of gradient descent that updates parameters using **one sample (or small batch)** at a time instead of the entire dataset.
+
+---
+
+## SGD vs Batch Gradient Descent
+
+| | Batch GD | SGD |
+|---|---|---|
+| Gradient computed on | Entire dataset | 1 sample at a time |
+| Speed per iteration | Slow | Fast |
+| Memory usage | High | Low |
+| Convergence path | Smooth | Noisy / erratic |
+| Local minima escape | ❌ Harder | ✅ Easier (noise helps) |
+| Best for | Small datasets | Large datasets |
+
+---
+
+## Update Rule
+
+```
+θ = θ - η · ∇J(θ; xᵢ, yᵢ)
+```
+
+- **θ** — model parameters
+- **η** — learning rate
+- **∇J(θ; xᵢ, yᵢ)** — gradient computed on single sample (xᵢ, yᵢ)
+
+---
+
+## Python Implementation from Scratch
+
+```python
+import numpy as np
+
+# Generate data: y = 4 + 3X + noise
+np.random.seed(42)
+X = 2 * np.random.rand(100, 1)
+y = 4 + 3 * X + np.random.randn(100, 1)
+
+def sgd(X, y, learning_rate=0.1, epochs=1000, batch_size=1):
+    m = len(X)
+    theta = np.random.randn(2, 1)
+    X_bias = np.c_[np.ones((m, 1)), X]   # add bias column
+    cost_history = []
+
+    for epoch in range(epochs):
+        # Shuffle data each epoch
+        indices = np.random.permutation(m)
+        X_shuffled = X_bias[indices]
+        y_shuffled = y[indices]
+
+        for i in range(0, m, batch_size):
+            X_batch = X_shuffled[i:i + batch_size]
+            y_batch = y_shuffled[i:i + batch_size]
+
+            gradients = (2 / batch_size) * X_batch.T.dot(
+                X_batch.dot(theta) - y_batch)
+            theta -= learning_rate * gradients
+
+        cost = np.mean((X_bias.dot(theta) - y) ** 2)
+        cost_history.append(cost)
+
+    return theta, cost_history
+
+theta_final, cost_history = sgd(X, y, learning_rate=0.1, epochs=1000)
+print(f"Final parameters: {theta_final}")
+# θ₀ ≈ 4.35 (intercept), θ₁ ≈ 3.45 (slope)
+# Fitted model: y = 4.35 + 3.45·X
+```
+
+---
+
+## Advantages & Challenges
+
+| ✅ Advantages | ⚠️ Challenges |
+|--------------|--------------|
+| Fast — fewer computations per step | Noisy updates, erratic convergence |
+| Memory efficient — no full dataset needed | Sensitive to learning rate |
+| Can escape local minima / saddle points | May take longer overall to converge |
+| Supports online learning (incremental) | Needs learning rate scheduling |
+
+---
+
+## SGD Variants
+
+| Variant | Key Idea |
+|---------|---------|
+| **SGD** | 1 sample per update |
+| **Mini-Batch SGD** | Small batch (e.g. 32, 64 samples) |
+| **Momentum SGD** | Adds fraction of previous gradient to dampen oscillation |
+| **Adam** | Adaptive learning rate = Momentum + RMSprop |
+
+> **Mini-Batch SGD** is what most people mean when they say "SGD" in practice
+
+---
+
+## Applications
+
+| Domain | Use |
+|--------|-----|
+| **Deep Learning** | Default optimizer for large neural networks |
+| **NLP** | Training Word2Vec, transformers |
+| **Computer Vision** | Training CNNs for image classification/detection |
+| **Reinforcement Learning** | Optimizing DQN and policy gradient models |
+| **Online Learning** | Incremental updates as new data arrives |
+
+---
+
+## ML Relevance
+- SGD is the **foundation of all modern optimizers** (Adam, RMSprop, Adagrad)
+- The "noise" in SGD is actually useful — helps escape bad local minima
+- In practice: use **Adam** for most tasks, **SGD + momentum** for CNNs
+- Batch size is a key hyperparameter — larger batch = more stable but slower
