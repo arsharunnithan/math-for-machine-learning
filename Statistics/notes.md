@@ -218,3 +218,312 @@ X̄ ~ N(μ, σ/√n)
 - **CLT** — justifies using normal-based tests on large datasets
 - **Confidence intervals** — quantify uncertainty in model performance metrics
 - **p-values** — used to evaluate feature significance in linear models
+---
+# Covariance and Correlation
+
+## Covariance
+Measures how two variables **change together** — direction of relationship.
+
+### Formulas
+
+**Sample Covariance** (use n-1, Bessel's correction):
+```
+Cov(X,Y) = Σ(Xᵢ - X̄)(Yᵢ - Ȳ) / (n-1)
+```
+
+**Population Covariance** (use n):
+```
+Cov(X,Y) = Σ(Xᵢ - μX)(Yᵢ - μY) / n
+```
+
+### Types
+
+| Type | Meaning |
+|------|---------|
+| **Positive** | Both variables increase together |
+| **Negative** | One increases, other decreases |
+| **Zero** | No linear relationship |
+
+> Range: **-∞ to +∞** — hard to interpret magnitude
+
+---
+
+## Correlation
+Standardized version of covariance — measures **direction AND strength** of relationship.
+
+```
+Corr(X,Y) = Σ(xᵢ - x̄)(yᵢ - ȳ) / √[Σ(xᵢ-x̄)² · Σ(yᵢ-ȳ)²]
+```
+
+> Equivalently: `Corr(X,Y) = Cov(X,Y) / (σX · σY)`
+
+### Interpretation
+
+| Value | Meaning |
+|-------|---------|
+| Close to **+1** | Strong positive relationship |
+| Close to **-1** | Strong negative relationship |
+| **0** | No linear relationship |
+
+> Range: **-1 to +1** — always interpretable
+
+---
+
+## Covariance vs Correlation
+
+| Aspect | Covariance | Correlation |
+|--------|-----------|-------------|
+| Range | -∞ to +∞ | -1 to +1 |
+| Tells you | Direction only | Direction + Strength |
+| Scale dependent? | ✅ Yes | ❌ No (dimensionless) |
+| Comparable across datasets? | ❌ No | ✅ Yes |
+
+---
+
+## Applications
+
+| Domain | Covariance | Correlation |
+|--------|-----------|-------------|
+| Finance | Portfolio risk (how stocks move together) | — |
+| ML | PCA (covariance matrix of features) | Feature selection |
+| Medical | — | Blood pressure vs cholesterol |
+| Weather | — | Temperature vs humidity |
+
+---
+
+## ML Relevance
+- **PCA** is built on the **covariance matrix** of features
+- **Feature selection** — drop highly correlated features to reduce redundancy
+- **Multicollinearity** in regression — high correlation between predictors causes instability
+- Correlation ≠ causation — a key principle when interpreting model features
+---
+# Confidence Intervals
+
+## What is it?
+A range of values that likely contains the **true population parameter**.
+
+> Instead of "average height is 165 cm" → "we are 95% confident the average height is between 160–170 cm"
+
+---
+
+## Confidence Levels
+
+| Level | Meaning |
+|-------|---------|
+| 90% | 90 out of 100 intervals contain the true value |
+| **95%** | 95 out of 100 — most commonly used |
+| 99% | 99 out of 100 — more conservative, wider interval |
+
+```
+Confidence Level = 1 - α
+```
+> α = significance level (0.05 for 95% CI)
+
+---
+
+## Formula
+
+```
+CI = Point Estimate ± Margin of Error
+   = x̄ ± (Critical Value × Standard Error)
+```
+
+**Standard Error:**
+```
+SE = Standard Deviation / √n
+```
+
+---
+
+## When to Use t vs Z Distribution
+
+| | t-distribution | Z-distribution |
+|---|---|---|
+| Sample size | Small (n < 30) | Large (n > 30) |
+| Population std dev | Unknown | Known |
+| Critical value (95%) | From t-table (varies with df) | 1.96 |
+
+### Common Z-values
+
+| Confidence Level | Z-value |
+|-----------------|---------|
+| 90% | 1.645 |
+| 95% | 1.960 |
+| 99% | 2.576 |
+
+---
+
+## Worked Example — t-distribution
+
+n=10, mean=240 kg, std=25 kg, 95% CI
+
+```
+df = n - 1 = 9
+α = 0.025
+t-value (df=9, α=0.025) = 2.262
+
+CI = 240 ± 2.262 × (25/√10)
+   = (222.12, 257.88)
+```
+
+```python
+import scipy.stats as stats
+import math
+
+mean, std, n = 240, 25, 10
+t = stats.t.ppf(0.975, df=n-1)
+moe = t * (std / math.sqrt(n))
+print(f"CI: ({mean-moe:.2f}, {mean+moe:.2f})")
+# CI: (222.12, 257.88)
+```
+
+## Worked Example — Z-distribution
+
+n=50, mean=4.63, std=0.54, 95% CI
+
+```
+SE = 0.54 / √50 = 0.0764
+MOE = 1.96 × 0.0764 = 0.1497
+
+CI = (4.480, 4.780)
+```
+
+```python
+from scipy import stats
+import numpy as np
+
+mean, std_dev, n = 4.63, 0.54, 50
+se = std_dev / np.sqrt(n)
+moe = 1.960 * se
+print(f"CI: ({mean-moe:.3f}, {mean+moe:.3f})")
+# CI: (4.480, 4.780)
+```
+
+---
+
+## Types of Confidence Intervals
+
+| Type | When to Use |
+|------|------------|
+| **Mean (normal data)** | t-dist (n<30) or Z-dist (n≥30) |
+| **Proportions** | % of population with a trait |
+| **Non-normal data** | Bootstrap resampling method |
+
+---
+
+## ML Relevance
+- **A/B testing** — CI tells you if a model improvement is statistically meaningful
+- **Model evaluation** — report accuracy with a CI, not just a single number
+- **Survey/data collection** — determine sample size needed for a given CI width
+- Wider CI = more uncertainty; narrower CI = more precision (needs larger n)
+---
+# Hypothesis Testing
+
+## What is it?
+Comparing two opposing claims about a population using sample data to decide which is more likely true.
+
+---
+
+## Key Terms
+
+| Term | Meaning |
+|------|---------|
+| **H₀ (Null Hypothesis)** | Default assumption — "no effect / no difference" |
+| **H₁ (Alternative Hypothesis)** | The claim to prove — "there is an effect" |
+| **α (Significance Level)** | Threshold for rejecting H₀ — usually 0.05 |
+| **p-value** | Probability of observing the data if H₀ is true |
+| **Test Statistic** | Number measuring how far data deviates from H₀ |
+| **Critical Value** | Cutoff to compare test statistic against |
+| **Degrees of Freedom** | Depends on sample size — used to find critical value |
+
+---
+
+## Types of Tests
+
+| Type | When to Use | Example |
+|------|-------------|---------|
+| **One-tailed (left)** | Expect decrease only | H₁: μ < 50 |
+| **One-tailed (right)** | Expect increase only | H₁: μ > 50 |
+| **Two-tailed** | Expect change in either direction | H₁: μ ≠ 50 |
+
+---
+
+## Type I & Type II Errors
+
+| | H₀ is True | H₀ is False |
+|---|---|---|
+| **Fail to Reject H₀** | ✅ Correct | ❌ Type II Error (β) — False Negative |
+| **Reject H₀** | ❌ Type I Error (α) — False Positive | ✅ Correct |
+
+> **Power of test** = 1 - β (probability of correctly rejecting a false H₀)
+
+---
+
+## Steps in Hypothesis Testing
+
+1. **Define hypotheses** — H₀ and H₁
+2. **Choose significance level** — usually α = 0.05
+3. **Collect and analyze data**
+4. **Calculate test statistic**
+5. **Make decision** — compare p-value to α or test statistic to critical value
+6. **Interpret results**
+
+**Decision rules:**
+```
+p-value ≤ α   →  Reject H₀
+p-value > α   →  Fail to reject H₀
+```
+
+---
+
+## Choosing the Right Test
+
+| Test | When to Use |
+|------|-------------|
+| **Z-test** | Large sample (n≥30), population variance known |
+| **T-test** | Small sample or unknown population variance |
+| **Chi-square** | Categorical data — observed vs expected counts |
+| **ANOVA / F-test** | Comparing means across 3+ groups |
+
+---
+
+## Worked Example — Drug Trial (Paired T-test)
+
+**H₀:** Drug has no effect on blood pressure
+**H₁:** Drug has an effect
+
+```python
+import numpy as np
+from scipy import stats
+
+before = np.array([120, 122, 118, 130, 125, 128, 115, 121, 123, 119])
+after  = np.array([115, 120, 112, 128, 122, 125, 110, 117, 119, 114])
+
+t_stat, p_val = stats.ttest_rel(after, before)
+print(f"T: {t_stat:.2f}")       # T: -9.0
+print(f"P: {p_val:.8f}")        # P: 0.00000854
+```
+
+> T = -9.0, p ≈ 0.0000085 → p < 0.05 → **Reject H₀** → drug significantly lowers blood pressure
+
+**T-statistic formula:**
+```
+t = m / (s / √n)     where m = mean of differences, s = std, n = sample size
+```
+
+---
+
+## Limitations
+
+- p < 0.05 doesn't mean the effect is large — just statistically significant
+- Sensitive to data quality
+- Focuses on one specific claim — can miss broader patterns
+
+---
+
+## ML Relevance
+- **Feature selection** — test if a feature is significantly correlated with target
+- **A/B testing** — compare model versions statistically
+- **Model evaluation** — check if accuracy improvement is significant or by chance
+- **Linear regression** — p-values of coefficients are hypothesis tests
+---
