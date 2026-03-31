@@ -519,6 +519,11 @@ t = m / (s / √n)     where m = mean of differences, s = std, n = sample size
 - Sensitive to data quality
 - Focuses on one specific claim — can miss broader patterns
 
+## ML Relevance
+- **Feature selection** — test if a feature is significantly correlated with target
+- **A/B testing** — compare model versions statistically
+- **Model evaluation** — check if accuracy improvement is significant or by chance
+- **Linear regression** — p-values of coefficients are hypothesis tests
 ---
 # P-Value
 
@@ -638,9 +643,4 @@ print(f"p-value: {p_value:.4f}")
 - **A/B testing** — p-value determines if one model/version is truly better
 - **Model comparison** — check if performance improvement is statistically significant
 
-## ML Relevance
-- **Feature selection** — test if a feature is significantly correlated with target
-- **A/B testing** — compare model versions statistically
-- **Model evaluation** — check if accuracy improvement is significant or by chance
-- **Linear regression** — p-values of coefficients are hypothesis tests
 ---
