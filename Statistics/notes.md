@@ -520,6 +520,123 @@ t = m / (s / √n)     where m = mean of differences, s = std, n = sample size
 - Focuses on one specific claim — can miss broader patterns
 
 ---
+# P-Value
+
+## What is it?
+The probability of observing results **as extreme as the ones obtained**, assuming the null hypothesis is true.
+
+> "If nothing unusual is happening, how surprising are these results?"
+
+- **Small p-value** → results unlikely by chance → strong evidence against H₀
+- **Large p-value** → results consistent with random variation → insufficient evidence to reject H₀
+
+---
+
+## Decision Rule
+
+```
+p-value ≤ α  →  Reject H₀       (result is statistically significant)
+p-value > α  →  Fail to reject H₀
+```
+
+> α is usually **0.05** (5% significance level)
+
+---
+
+## How to Calculate P-Value (Steps)
+
+1. State H₀ and H₁
+2. Choose the appropriate statistical test
+3. Calculate the test statistic
+4. Determine the sampling distribution (t, Z, chi-square, F)
+5. Find area in the tail(s) of the distribution = p-value
+6. Compare p-value to α and decide
+
+---
+
+## Statistical Tests
+
+| Test | When to Use |
+|------|-------------|
+| **Z-test** | Large sample, known population variance |
+| **T-test** | Small sample or unknown variance |
+| **Chi-square** | Categorical data — observed vs expected |
+| **F-test** | Comparing variances or 3+ group means |
+| **Correlation test** | Testing linear relationship between variables |
+
+---
+
+## Worked Example — Two-Sample T-test
+
+Males: n=30, mean=175, std=5
+Females: n=35, mean=168, std=6
+
+**H₀:** No difference in mean height
+**H₁:** Significant difference exists
+
+```
+t = (175 - 168) / √(5²/30 + 6²/35) = 7 / √1.8619 ≈ 5.13
+df = (30 + 35) - 2 = 63
+```
+
+```python
+import scipy.stats as stats
+
+t_statistic = 5.13
+df = 63
+
+p_value = 2 * (1 - stats.t.cdf(abs(t_statistic), df))
+print("P value:", p_value)  # 2.99e-06
+```
+
+> p ≈ 0.000003 << 0.05 → **Reject H₀** → significant height difference exists
+
+---
+
+## One-Sample T-test (Python)
+
+```python
+import numpy as np
+import scipy.stats as stats
+
+sample_data = [78, 82, 88, 95, 79, 92, 85, 88, 75, 80]
+population_mean = 85
+
+t_stat, p_value = stats.ttest_1samp(sample_data, population_mean)
+print(f"t-statistic: {t_stat:.4f}")
+print(f"p-value: {p_value:.4f}")
+# p > 0.05 → fail to reject H₀
+```
+
+---
+
+## What Influences the P-Value?
+
+| Factor | Effect |
+|--------|--------|
+| **Larger sample size** | Smaller p-value (easier to detect significance) |
+| **Larger effect size** | Smaller p-value |
+| **Higher data variability** | Larger p-value |
+| **Lower α** | Higher bar for significance |
+| **Choice of test** | Different tests → different p-values |
+
+---
+
+## Common Misunderstandings
+
+| ❌ Wrong | ✅ Correct |
+|---------|----------|
+| p < 0.05 means H₀ is false | p < 0.05 means data is unlikely under H₀ |
+| p-value = probability H₀ is true | p-value = probability of data given H₀ is true |
+| Small p = large effect | Small p ≠ practically significant |
+
+---
+
+## ML Relevance
+- **Feature selection** — features with p < 0.05 are statistically significant predictors
+- **Linear regression** — each coefficient has a p-value showing its significance
+- **A/B testing** — p-value determines if one model/version is truly better
+- **Model comparison** — check if performance improvement is statistically significant
 
 ## ML Relevance
 - **Feature selection** — test if a feature is significantly correlated with target
