@@ -929,3 +929,96 @@ MLE finds the green curve systematically.
 - **Loss functions** — cross-entropy loss = negative log-likelihood
 - Foundation of **Bayesian inference** (MLE is a special case)
 ---
+# Mean Squared Error (MSE)
+
+## What is it?
+Measures the **average squared difference** between predicted and actual values.
+
+```
+MSE = (1/n) Σ(yᵢ - ŷᵢ)²
+```
+
+- **n** — number of observations
+- **yᵢ** — actual value
+- **ŷᵢ** — predicted value
+
+---
+
+## Interpretation
+
+| MSE Value | Meaning |
+|-----------|---------|
+| Lower | Predictions closer to actual → better model |
+| Higher | Predictions further from actual → worse model |
+
+> MSE **penalizes large errors more heavily** — squaring amplifies big mistakes
+
+---
+
+## Worked Example
+
+**Actual:** [10, 20, 30, 40, 50]
+**Predicted:** [12, 18, 32, 38, 48]
+
+```
+Squared differences: (10-12)² + (20-18)² + (30-32)² + (40-38)² + (50-48)²
+                   = 4 + 4 + 4 + 4 + 4 = 20
+
+MSE = 20 / 5 = 4
+```
+
+---
+
+## RMSE (Root Mean Squared Error)
+
+```
+RMSE = √MSE
+```
+
+> RMSE is in the **same units as the original data** — easier to interpret than MSE
+
+**Example:** MSE = 9 → RMSE = √9 = **3**
+
+---
+
+## MSE vs RMSE vs MAE
+
+| Metric | Formula | Units | Outlier Sensitive? |
+|--------|---------|-------|-------------------|
+| **MAE** | (1/n) Σ\|yᵢ - ŷᵢ\| | Same as data | Less sensitive |
+| **MSE** | (1/n) Σ(yᵢ - ŷᵢ)² | Squared units | ✅ More sensitive |
+| **RMSE** | √MSE | Same as data | ✅ More sensitive |
+
+> Use **MAE** when outliers should have less influence
+> Use **MSE/RMSE** when large errors should be penalized heavily
+
+---
+
+## How to Minimize MSE
+
+| Strategy | Description |
+|----------|-------------|
+| **Feature selection** | Choose features that reduce prediction error |
+| **Model selection** | Try different algorithms |
+| **Hyperparameter tuning** | Optimize learning rate, regularization, depth |
+| **Regularization** | Prevent overfitting that inflates test MSE |
+
+---
+
+## Applications
+
+| Domain | Use |
+|--------|-----|
+| **Regression** | Primary loss function for training |
+| **Model evaluation** | Compare performance across models |
+| **Gradient descent** | MSE gradient used to update weights |
+| **Image processing** | Measure image reconstruction quality |
+| **Finance** | Evaluate forecast accuracy |
+
+---
+
+## ML Relevance
+- **Linear Regression** minimizes MSE during training
+- **Gradient descent** computes ∂MSE/∂w to update weights
+- RMSE is the standard metric reported for regression tasks
+- MSE is differentiable everywhere → mathematically convenient for optimization
