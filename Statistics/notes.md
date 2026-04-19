@@ -717,10 +717,215 @@ diamonds.select_dtypes(include="number").kurtosis()
 | Positive value means | Right tail is longer | Heavier tails than normal |
 | Negative value means | Left tail is longer | Lighter tails than normal |
 
----
-
 ## ML Relevance
 - **Feature engineering** — highly skewed features often need log/sqrt transformation before modelling
 - **Outlier detection** — high kurtosis signals heavy tails = more extreme values
 - **Model assumptions** — many models (linear regression, LDA) assume normally distributed data (skewness ≈ 0)
 - **Data preprocessing** — checking skewness is a standard EDA step before training
+---
+# Bias & Variance Tradeoff
+
+## Core Concepts
+
+### Bias
+Error from a model being **too simple** — misses patterns in data.
+
+```
+Bias² = (E[f̂(x)] - f(x))²
+```
+
+- **High bias** → underfitting → poor training AND test performance
+- Example: Linear model on non-linear data
+
+### Variance
+Error from a model being **too sensitive** to training data — captures noise.
+
+```
+Variance = E[(f̂(x) - E[f̂(x)])²]
+```
+
+- **High variance** → overfitting → good training, poor test performance
+- Example: Deep decision tree that memorizes training data
+
+---
+
+## Total Error
+
+```
+Total Error = Bias² + Variance + Irreducible Noise
+```
+
+---
+
+## The Tradeoff
+
+| Model | Bias | Variance | Result |
+|-------|------|----------|--------|
+| Too simple | High | Low | Underfitting |
+| Just right | Moderate | Moderate | Best generalization |
+| Too complex | Low | High | Overfitting |
+
+### Dartboard Analogy
+
+| Situation | Description |
+|-----------|-------------|
+| High Bias | Darts clustered together but far from center |
+| High Variance | Darts scattered all over the board |
+| Low Bias + Low Variance | Darts tightly grouped near center ✅ |
+
+---
+
+## How to Fix
+
+| Problem | Solutions |
+|---------|-----------|
+| **High Bias** | Use more complex model, add features, reduce regularization |
+| **High Variance** | Simplify model, get more data, add regularization (L1/L2), use ensemble methods |
+
+---
+
+## Python Example
+
+```python
+import numpy as np
+from sklearn.linear_model import LinearRegression
+from sklearn.preprocessing import PolynomialFeatures
+from sklearn.model_selection import train_test_split
+
+np.random.seed(42)
+X = np.linspace(0, 1, 50).reshape(-1, 1)
+y = np.sin(2 * np.pi * X).ravel() + np.random.normal(0, 0.2, 50)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
+
+def bias_variance(model, X_tr, y_tr, X_te, y_te, runs=30):
+    preds = []
+    n = X_tr.shape[0]
+    for _ in range(runs):
+        idx = np.random.choice(n, n, replace=True)
+        preds.append(model.fit(X_tr[idx], y_tr[idx]).predict(X_te))
+    preds = np.array(preds)
+    mean_pred = preds.mean(axis=0)
+    bias_sq = ((y_te - mean_pred)**2).mean()
+    variance = preds.var(axis=0).mean()
+    return bias_sq, variance, bias_sq + variance
+
+# High Bias — Linear Regression
+b, v, e = bias_variance(LinearRegression(), X_train, y_train, X_test, y_test)
+print(f"Linear → Bias²: {b:.3f}, Variance: {v:.3f}, Error: {e:.3f}")
+# Bias²: 0.218, Variance: 0.014 → High bias, low variance
+
+# High Variance — Polynomial (degree 10)
+poly = PolynomialFeatures(degree=10)
+X_tr_p = poly.fit_transform(X_train)
+X_te_p = poly.transform(X_test)
+b, v, e = bias_variance(LinearRegression(), X_tr_p, y_train, X_te_p, y_test)
+print(f"Poly   → Bias²: {b:.3f}, Variance: {v:.3f}, Error: {e:.3f}")
+# Bias²: 0.043, Variance: 0.416 → Low bias, high variance
+```
+
+---
+
+## ML Relevance
+- **Most important concept** for understanding model performance
+- **Cross-validation** — key tool for detecting high variance
+- **Regularization (L1/L2)** — directly controls variance
+- **Ensemble methods** (bagging → reduces variance, boosting → reduces bias)
+- Interview classic: *"What's the difference between overfitting and underfitting?"* = this
+---
+# Maximum Likelihood Estimation (MLE)
+
+## What is it?
+A method to find the **best-fitting probability distribution** for observed data by finding parameters that maximize the likelihood of seeing that data.
+
+> "Which parameters make the observed data most probable?"
+
+---
+
+## Key Concepts
+
+### Probability Density Function (PDF)
+For a continuous random variable X:
+```
+P(a ≤ X ≤ b) = ∫ f(x) dx   from a to b
+```
+- f(x) describes how probability is spread across values
+- Total area under curve = 1
+
+### Density Estimation
+Process of finding the PDF of a population by examining a sample.
+
+| Type | Description |
+|------|-------------|
+| **Parametric** | Assumes data follows a known distribution (e.g. normal) — estimates mean & std dev |
+| **Non-parametric** | No assumption about distribution — uses algorithms like Kernel Density Estimation (KDE) |
+
+**KDE formula:**
+```
+f̂ₕ(x) = (1/nh) Σ K((x - xᵢ)/h)
+```
+- K = kernel function
+- h = bandwidth (smoothing parameter)
+
+---
+
+## Maximum Likelihood Estimation
+
+### Likelihood Function
+```
+L = Π P(xᵢ | θ)    for i = 1 to n
+```
+- θ = parameters (e.g. mean, std dev)
+- Goal: find θ that **maximizes L**
+
+### How to Maximize
+Set derivative to zero:
+```
+∂L/∂θ = 0
+```
+
+### Log-Likelihood (used in practice)
+Products are hard to differentiate — take log instead:
+```
+log(L) = Σ log[P(xᵢ | θ)]    for i = 1 to n
+```
+
+> Since log is monotonically increasing, maximizing log(L) = maximizing L
+> Converts products → sums → much easier to differentiate
+
+### Steps
+1. Choose a probability distribution
+2. Write the likelihood function L
+3. Take log → log-likelihood
+4. Differentiate w.r.t. parameters
+5. Set derivative = 0, solve for parameters
+
+---
+
+## Intuition
+
+Multiple PDF curves fitted over data:
+- **Red curves** → poor fit → low likelihood
+- **Green curve** → best fit → maximum likelihood ✅
+
+MLE finds the green curve systematically.
+
+---
+
+## Parametric vs Non-parametric Density Estimation
+
+| | Parametric | Non-parametric (KDE) |
+|---|---|---|
+| Assumes distribution? | ✅ Yes | ❌ No |
+| Parameters | Mean, std dev | Bandwidth h |
+| Single peak? | Yes | Can handle multiple peaks |
+| Use case | Normal-ish data | Skewed or multimodal data |
+
+---
+
+## ML Relevance
+- **Logistic Regression** is trained using MLE (maximizes log-likelihood of correct labels)
+- **Naive Bayes** estimates class probabilities using MLE
+- **Gaussian Mixture Models (GMM)** — MLE via EM algorithm
+- **Loss functions** — cross-entropy loss = negative log-likelihood
+- Foundation of **Bayesian inference** (MLE is a special case)
+---
