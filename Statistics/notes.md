@@ -1022,3 +1022,160 @@ RMSE = √MSE
 - **Gradient descent** computes ∂MSE/∂w to update weights
 - RMSE is the standard metric reported for regression tasks
 - MSE is differentiable everywhere → mathematically convenient for optimization
+---
+# Parametric Tests: T-test, Z-test, F-test, Chi-square
+
+## When to Use Which?
+
+| Test | Data Type | Sample Size | Compares |
+|------|-----------|-------------|---------|
+| **Z-test** | Continuous | Large (n ≥ 30), known population σ | Sample mean vs population mean |
+| **T-test** | Continuous | Small (n < 30), unknown σ | Means between groups |
+| **F-test (ANOVA)** | Continuous | Any | Variances or 3+ group means |
+| **Chi-square** | Categorical | Any | Observed vs expected frequencies |
+
+---
+
+## Z-test
+
+Tests if a **sample mean differs from a known population mean** (large sample).
+
+```
+Z = (x̄ - μ) / (σ / √n)
+```
+
+**When to use:**
+- n ≥ 30
+- Population standard deviation (σ) is known
+
+**Example:** Is the average height of 50 students (x̄ = 172) different from the national average (μ = 170, σ = 8)?
+```
+Z = (172 - 170) / (8 / √50) = 2 / 1.13 ≈ 1.77
+```
+Compare to critical value (1.96 for 95%) → fail to reject H₀
+
+```python
+from scipy import stats
+import numpy as np
+
+sample = np.array([...])   # your data
+mu, sigma = 170, 8
+z = (np.mean(sample) - mu) / (sigma / np.sqrt(len(sample)))
+p_value = 2 * (1 - stats.norm.cdf(abs(z)))
+```
+
+---
+
+## T-test
+
+Tests differences in means when **σ is unknown or sample is small**.
+
+### Types
+
+| Type | Use Case |
+|------|---------|
+| **One-sample** | Sample mean vs known value |
+| **Independent (two-sample)** | Two separate groups |
+| **Paired** | Same subjects, before vs after |
+
+**Formula (one-sample):**
+```
+t = (x̄ - μ) / (s / √n)     df = n - 1
+```
+
+**Formula (two-sample):**
+```
+t = (x̄₁ - x̄₂) / √(s₁²/n₁ + s₂²/n₂)     df = n₁ + n₂ - 2
+```
+
+```python
+from scipy import stats
+
+# One-sample
+t, p = stats.ttest_1samp(sample, popmean=170)
+
+# Independent two-sample
+t, p = stats.ttest_ind(group1, group2)
+
+# Paired
+t, p = stats.ttest_rel(before, after)
+```
+
+---
+
+## F-test (ANOVA)
+
+Tests if **variances are equal** or if **3+ group means are significantly different**.
+
+```
+F = Variance between groups / Variance within groups
+```
+
+- **F ≈ 1** → no significant difference between groups
+- **F >> 1** → at least one group mean is different
+
+**When to use:**
+- Comparing 3+ groups (e.g. 3 different treatments)
+- Testing if two variances are equal (before running a t-test)
+
+```python
+from scipy import stats
+
+# One-way ANOVA
+f, p = stats.f_oneway(group1, group2, group3)
+print(f"F: {f:.3f}, p: {p:.4f}")
+```
+
+> If p < 0.05 → at least one group mean is significantly different
+
+---
+
+## Chi-square Test (χ²)
+
+Tests **association between categorical variables** — observed vs expected counts.
+
+```
+χ² = Σ (Observed - Expected)² / Expected
+```
+
+### Types
+
+| Type | Use Case |
+|------|---------|
+| **Goodness of fit** | Does data follow an expected distribution? |
+| **Test of independence** | Are two categorical variables related? |
+
+**Example:** Is gender independent of product preference?
+
+```python
+from scipy.stats import chi2_contingency
+import numpy as np
+
+# Contingency table
+table = np.array([[30, 20],   # Male: Product A, B
+                  [15, 35]])  # Female: Product A, B
+
+chi2, p, dof, expected = chi2_contingency(table)
+print(f"χ²: {chi2:.3f}, p: {p:.4f}, df: {dof}")
+# p < 0.05 → gender and preference are NOT independent
+```
+
+---
+
+## Summary Comparison
+
+| | Z-test | T-test | F-test | Chi-square |
+|---|---|---|---|---|
+| **Data type** | Continuous | Continuous | Continuous | Categorical |
+| **Sample size** | Large | Small/Any | Any | Any |
+| **Knows σ?** | ✅ Yes | ❌ No | — | — |
+| **Compares** | Mean vs μ | Means | Variances/3+ means | Frequencies |
+| **Distribution** | Normal (Z) | t-distribution | F-distribution | χ² distribution |
+
+---
+
+## ML Relevance
+- **T-test** — A/B testing model performance, feature significance in linear regression
+- **F-test** — ANOVA used in feature selection, comparing multiple models
+- **Chi-square** — Feature selection for categorical variables
+- **Z-test** — Large-scale experiments, population-level comparisons
