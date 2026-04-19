@@ -644,3 +644,83 @@ print(f"p-value: {p_value:.4f}")
 - **Model comparison** — check if performance improvement is statistically significant
 
 ---
+# Skewness and Kurtosis
+
+## Skewness
+Measures **shape of distribution** — symmetric or asymmetric.
+
+| Value | Distribution | Meaning |
+|-------|-------------|---------|
+| = 0 | Normal | Perfectly symmetric |
+| > 0 | Right-skewed (positive) | Longer tail on the right |
+| < 0 | Left-skewed (negative) | Longer tail on the left |
+
+> In right-skewed data: **Mean > Median > Mode**
+> In left-skewed data: **Mean < Median < Mode**
+
+### Pearson's Second Coefficient of Skewness
+```
+Skewness = 3 × (Mean - Median) / Std Dev
+```
+
+### Python
+```python
+from scipy.stats import skew
+import seaborn as sns
+
+diamonds = sns.load_dataset("diamonds")
+prices = diamonds["price"]
+
+# SciPy method
+print(skew(prices))  # 1.618 → right-skewed
+
+# Pearson's method
+pearson = 3 * (prices.mean() - prices.median()) / prices.std()
+print(pearson)  # 1.152
+```
+
+---
+
+## Kurtosis
+Measures **tail heaviness** — how much data is in the extremes/outliers.
+
+| Type | Kurtosis | Excess Kurtosis | Meaning |
+|------|----------|-----------------|---------|
+| **Mesokurtic** | = 3 | = 0 | Normal distribution |
+| **Leptokurtic** | > 3 | > 0 | Heavy tails, more outliers |
+| **Platykurtic** | < 3 | < 0 | Light tails, fewer outliers |
+
+> Most libraries (SciPy default) report **excess kurtosis** = kurtosis - 3
+
+### Python
+```python
+from scipy.stats import kurtosis
+
+# Fisher's definition (excess kurtosis, normal = 0)
+print(kurtosis(prices))         # 2.18 → leptokurtic (heavy tails)
+
+# Pearson's definition (normal = 3)
+print(kurtosis(prices, fisher=False))
+
+# Kurtosis across all numeric columns
+diamonds.select_dtypes(include="number").kurtosis()
+```
+
+---
+
+## Skewness vs Kurtosis
+
+| | Skewness | Kurtosis |
+|---|---|---|
+| Measures | Asymmetry of distribution | Tail heaviness |
+| Normal value | 0 | 3 (or 0 excess) |
+| Positive value means | Right tail is longer | Heavier tails than normal |
+| Negative value means | Left tail is longer | Lighter tails than normal |
+
+---
+
+## ML Relevance
+- **Feature engineering** — highly skewed features often need log/sqrt transformation before modelling
+- **Outlier detection** — high kurtosis signals heavy tails = more extreme values
+- **Model assumptions** — many models (linear regression, LDA) assume normally distributed data (skewness ≈ 0)
+- **Data preprocessing** — checking skewness is a standard EDA step before training
