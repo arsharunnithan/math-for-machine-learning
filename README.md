@@ -56,7 +56,6 @@ math-for-machine-learning/
         └── t-Distribution
 ```
 
-> More topics will be added progressively.
 
 ---
 
